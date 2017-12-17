@@ -2,57 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum FingerType
-{
-    Thumb = 0,
-    Index = 1,
-    Mid = 2,
-    Ring = 3,
-    Pinky = 4
-}
-
-public enum FingerPosition
-{
-    Closed,
-    HalfOpen,
-    Open,
-    Unknown
-}
-
 public class Finger
 {
-    public readonly float CLOSED = 0.75f;
-    public readonly float OPEN = 0.15f;
-    public readonly float HALF_OPEN = 0.4f;
-    public readonly float HALF_CLOSED = 0.6f;
-
-    private FingerType finger_type;
-    private FingerPosition flex_postion;
-    private float finger_flex;
-
     private GameObject[] gob_bones;
     private Collider[] col_finger_colliders;
     private int i_collision_power = 0;
 
-    public float GetFingerFlex()
-    { return finger_flex; }
-
-    public FingerType GetFingerType()
-    { return finger_type; }
-
-    public FingerPosition GetFingerPosition()
-    { return flex_postion; }
-
     public int GetColPower()
     {
-        if (gob_bones[0].name == "boneTh1") ///BEZ SEMSU?
+        if (gob_bones[0].name == "boneTh1")
             return i_collision_power;
         return -1;
     }
 
-    public Finger(GameObject gobBone1, GameObject gobBone2, GameObject gobBone3, FingerType fingerType)
+    public Finger(GameObject gobBone1, GameObject gobBone2, GameObject gobBone3)
     {
-        finger_type = fingerType;
         gob_bones = new GameObject[3];
         gob_bones[0] = gobBone1;
         gob_bones[1] = gobBone2;
@@ -68,33 +32,17 @@ public class Finger
             col_finger_colliders[3] = _colTemp[1];
             col_finger_colliders[4] = _colTemp[2];
         }
-        flex_postion = FingerPosition.Open;
     }
 
     public void MoveFinger(float dPosition)
     {
-        finger_flex = dPosition;
-            //  if(0.75f * 90 * dPosition<45)
+      //  if(0.75f * 90 * dPosition<45)
             gob_bones[0].transform.localEulerAngles = new Vector3(90 * dPosition* dPosition, 0, 0);
      //   else
       //      gob_bones[0].transform.localEulerAngles = new Vector3(1.125f * 90 * dPosition*dPosition, 0, 0);
         if (1.5f * 90 * dPosition<90)
             gob_bones[1].transform.localEulerAngles = new Vector3(1.5f*90 * dPosition, 0, 0);
         gob_bones[2].transform.localEulerAngles = new Vector3(90 * dPosition, 0, 0);
-
-        UpdateFingerFlex();
-    }
-
-    private void UpdateFingerFlex()
-    {
-        if (finger_flex <= OPEN)
-            flex_postion = FingerPosition.Open;
-        else if (finger_flex >= CLOSED)
-            flex_postion = FingerPosition.Closed;
-        else if (HALF_OPEN <= finger_flex && finger_flex <= HALF_CLOSED)
-            flex_postion = FingerPosition.HalfOpen;
-        else
-            flex_postion = FingerPosition.Unknown;
     }
 
     public void UpdateCollider()

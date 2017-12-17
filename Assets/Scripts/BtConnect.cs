@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System;
 
 public class BtConnect
 {
-#if !UNITY_EDITOR
     private AndroidJavaObject current_activity;
     private AndroidJavaObject bt_manager;
 
@@ -11,6 +11,7 @@ public class BtConnect
     {
         AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         current_activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
         bt_manager = new AndroidJavaObject("com.unityplugin.bluetoothplugin.BluetoothManager",
                                       current_activity);
     }
@@ -53,7 +54,7 @@ public class BtConnect
     public bool SendData(String sDataToSend)
     {
         bool _bDataSend = false;
-        // PINKY;RING;MID;INDEX;THUMB _sExampleData = "<1;0.5;0.64;0.94;0;1>";
+        // kolejno palce: mały, serdeczny, środkowy, wskazujący, kciuk _sExampleData = "<1;0.5;0.64;0.94;0;1>";
         current_activity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
         {
             bt_manager.Call("Send", sDataToSend);
@@ -64,8 +65,7 @@ public class BtConnect
 
     public String sReceiveData()
     {
-        // (QUATERNION: X; Y; Z; W)(ACCELERATION: X; Y; Z)(FINGER FLEX: THUMB; INDEX; MID; RING; PINKY)
-        String temp = "0.00;0.00;0.00;0.00;0;0;0;0.00;0.00;0.00;0.00;0.00";
+        String temp = "0.00;0.00;0.00;0.00;0;0;0;0.00;0.00;0.00;0.00;0.00;0";
         temp = bt_manager.Call<String>("sReceiveData");
         return temp;
     }
@@ -79,5 +79,4 @@ public class BtConnect
     {
         return bt_manager.CallStatic<Boolean>("bDeviceHasBeenFound");
     }
-#endif
 }

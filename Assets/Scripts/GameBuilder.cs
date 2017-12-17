@@ -42,6 +42,7 @@ public class GameBuilder : MonoBehaviour
     {
         if (i_temp == 0 && bt_connector.bDeviceHasBeenFound())
         {
+            GameObject.Find("Cube").transform.localScale =new Vector3(2, 2, 3);
             bt_connector.StartBtConnection();
             i_temp++;
         }

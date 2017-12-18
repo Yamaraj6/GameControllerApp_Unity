@@ -3,7 +3,6 @@ using System;
 
 public class BtConnect
 {
-#if !UNITY_EDITOR
     private AndroidJavaObject current_activity;
     private AndroidJavaObject bt_manager;
 
@@ -79,5 +78,4 @@ public class BtConnect
     {
         return bt_manager.CallStatic<Boolean>("bDeviceHasBeenFound");
     }
-#endif
 }

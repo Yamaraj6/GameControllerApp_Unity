@@ -65,6 +65,9 @@ public class HandController
     public HandRotation GetHandRotation()
     { return hand_rotation; }
 
+    public Finger[] GetFingers()
+    { return fingers; }
+
     public void ChangeRotation(Quaternion gyroPosition)
     {
         hand.transform.rotation = new Quaternion(gyroPosition.z, -gyroPosition.x,
@@ -130,8 +133,9 @@ public class HandController
     {
         FingerPosition[] _fingersPosition = new FingerPosition[5];
         foreach (Finger finger in fingers)
+        {
             _fingersPosition[(int)finger.GetFingerType()] = finger.GetFingerPosition();
-
+        }
         if (_fingersPosition.IsEqual(OPEN_HAND))
         {
             hand_position = HandPosition.Open;
@@ -205,7 +209,7 @@ public class HandController
                     _sFingeName = "Pi";
                     break;
                 case 4:
-                    fingers[i] = new Finger(_bones[0], _bones[1], _bones[2], FingerType.Ring);
+                    fingers[i] = new Finger(_bones[0], _bones[1], _bones[2], FingerType.Pinky);
                     break;
             }
         }

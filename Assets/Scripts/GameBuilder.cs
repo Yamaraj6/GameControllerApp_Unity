@@ -8,13 +8,12 @@ public class GameBuilder : MonoBehaviour
 {
     [SerializeField]
     private Text txt_tutorial;
-
-    [SerializeField]
-    private Button connect_controller;
+    
 
     [SerializeField]
     private GameObject hand_controller;
     private Controller controller;
+    private float timer;
 
     void Start ()
     {
@@ -23,14 +22,12 @@ public class GameBuilder : MonoBehaviour
 
     void Update()
     {
-        if (!controller.IsConnected())
+        if (controller.IsConnected() && timer<=5)
         {
-            connect_controller.gameObject.SetActive(true);
+            txt_tutorial.gameObject.SetActive(true);
         } else
         {
-            connect_controller.gameObject.SetActive(false);
-//            if(controller)
-            txt_tutorial.gameObject.SetActive(true);
+            txt_tutorial.gameObject.SetActive(false);
         }
 
     }

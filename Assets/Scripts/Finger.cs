@@ -15,16 +15,13 @@ public enum FingerPosition
 {
     Closed,
     HalfOpen,
-    Open,
-    Unknown
+    Open
 }
 
 public class Finger
 {
-    public readonly float CLOSED = 0.75f;
-    public readonly float OPEN = 0.15f;
-    public readonly float HALF_OPEN = 0.4f;
-    public readonly float HALF_CLOSED = 0.6f;
+    public readonly float CLOSED = 0.5f;
+    public readonly float OPEN = 0.5f;
 
     private FingerType finger_type;
     private FingerPosition flex_postion;
@@ -91,10 +88,8 @@ public class Finger
             flex_postion = FingerPosition.Open;
         else if (finger_flex >= CLOSED)
             flex_postion = FingerPosition.Closed;
-        else if (HALF_OPEN <= finger_flex && finger_flex <= HALF_CLOSED)
-            flex_postion = FingerPosition.HalfOpen;
         else
-            flex_postion = FingerPosition.Unknown;
+            flex_postion = FingerPosition.HalfOpen;
     }
 
     public void UpdateCollider()

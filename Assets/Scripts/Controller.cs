@@ -23,11 +23,12 @@ public class Controller : MonoBehaviour
     private int calibrate;
 
     public GameObject testcube;
-    public Text text;
+    public Text txt_debug;
 
     void Start()
     {
         hand_controller = new HandController(gameObject);
+
 #if !UNITY_EDITOR
         bt_connector = new BtConnect();
 #endif
@@ -39,26 +40,36 @@ public class Controller : MonoBehaviour
         calibrate = 0;
 
 #if !UNITY_EDITOR
-        bt_connector.DiscoverDevices();     ///????????
-        ConnectController();
+        StartCoroutine(ConnectController());
 #endif
 
         hand_positions = new List<HandPosition>();
+        hand_rotations = new List<HandRotation>();
 
-        UpdateHandPositions();
-        text.text = connection_status.ToString();
+        StartCoroutine(UpdateHandPositions());
     }
 
     void Update()
     {
+        txt_debug.text = GetDebugInfo();
         CommunicationUpdate();
         if (Input.GetMouseButton(0))
         {
-#if !UNITY_EDITOR
-            ConnectController();
-#endif
             Calibrate();
         }
+    }
+
+    private String GetDebugInfo()
+    {
+        String temp = connection_status.ToString() + '\n';
+        temp += "Hand Pos: ";
+        temp += hand_controller.GetHandPosition().ToString() + "\n";
+        temp += "Hand Rot: ";
+        temp += hand_controller.GetHandRotation().ToString() + "\n"; ;
+        for (int i = 0; i < hand_controller.GetFingers().Length; i++)
+            temp += hand_controller.GetFingers()[i].GetFingerPosition() + " ";
+
+        return temp;
     }
 
     public bool IsConnected()
@@ -70,14 +81,18 @@ public class Controller : MonoBehaviour
 #if !UNITY_EDITOR
     public IEnumerator ConnectController()
     {
-        yield return new WaitUntil(() => !bt_connector.bDeviceHasBeenFound());
+        bt_connector.DiscoverDevices();
+        yield return new WaitUntil(() => bt_connector.bDeviceHasBeenFound() || (Time.time % 15 == 0 && Time.time > 1));
         bt_connector.StartBtConnection();
         connection_status = ConnectionStatus.Connecting;
-        yield return new WaitUntil(() => !bt_connector.bIsConnected());
+        yield return new WaitUntil(() => bt_connector.bIsConnected() || (Time.time % 15 == 0 && Time.time > 1));
         if (bt_connector.bIsConnected())
             connection_status = ConnectionStatus.Connected;
         else
             connection_status = ConnectionStatus.Disconnected;
+        yield return new WaitUntil(() => !bt_connector.bIsConnected());
+        connection_status = ConnectionStatus.Disconnected;
+        ConnectController();
     }
 #endif
 
@@ -148,15 +163,17 @@ public class Controller : MonoBehaviour
             hand_positions.RemoveAt(0);
             hand_rotations.RemoveAt(0);
         }
-        UpdateHandPositions();
+        StartCoroutine(UpdateHandPositions());
     }
 
     private void RecognizeGesture()
     {
         if (hand_positions.First<HandPosition>() == HandPosition.Open &&
             hand_positions.Last<HandPosition>() == HandPosition.Fist)
-            GameObject.Instantiate(GameObject.Find("Cube"), new Vector3(3, 3, 3), 
-                new Quaternion(0, 0, 0, 0), GameObject.Find("Cube").transform);
+        {
+            GameObject go = Instantiate(testcube);
+            go.SetActive(true);
+        }
 
     }
 }

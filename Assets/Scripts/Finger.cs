@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum FingerType
+public enum FingerName
 {
     Thumb = 0,
     Index = 1,
@@ -13,17 +13,15 @@ public enum FingerType
 
 public enum FingerPosition
 {
-    Closed,
-    HalfOpen,
-    Open
+    Bent,
+    Straight
 }
 
 public class Finger
 {
-    public readonly float CLOSED = 0.5f;
-    public readonly float OPEN = 0.5f;
+    public readonly float BENT = 0.5f;
 
-    private FingerType finger_type;
+    private FingerName finger_name;
     private FingerPosition flex_postion;
     private float finger_flex;
 
@@ -34,8 +32,8 @@ public class Finger
     public float GetFingerFlex()
     { return finger_flex; }
 
-    public FingerType GetFingerType()
-    { return finger_type; }
+    public FingerName GetFingerName()
+    { return finger_name; }
 
     public FingerPosition GetFingerPosition()
     { return flex_postion; }
@@ -47,55 +45,47 @@ public class Finger
         return -1;
     }
 
-    public Finger(GameObject gobBone1, GameObject gobBone2, GameObject gobBone3, FingerType fingerType)
+    public Finger(GameObject gobBone1, GameObject gobBone2, GameObject gobBone3, FingerName fingerType)
     {
-        finger_type = fingerType;
+        finger_name = fingerType;
         gob_bones = new GameObject[3];
         gob_bones[0] = gobBone1;
         gob_bones[1] = gobBone2;
         gob_bones[2] = gobBone3;
         if (gobBone1.name == "boneTh1")
         {
-            col_finger_colliders = new Collider[5];
-            col_finger_colliders[0] = gobBone1.GetComponentInChildren<Collider>();
-            col_finger_colliders[1] = gobBone2.GetComponentInChildren<Collider>();
-            Collider[] _colTemp = new Collider[3];
+            col_finger_colliders = new Collider[2];
+            Collider[] _colTemp = new Collider[2];
             _colTemp = gobBone3.GetComponentsInChildren<Collider>();
-            col_finger_colliders[2] = _colTemp[0];
-            col_finger_colliders[3] = _colTemp[1];
-            col_finger_colliders[4] = _colTemp[2];
+            col_finger_colliders[0] = _colTemp[0];
+            col_finger_colliders[1] = _colTemp[1];
         }
-        flex_postion = FingerPosition.Open;
+        flex_postion = FingerPosition.Straight;
     }
 
     public void MoveFinger(float dPosition)
     {
         finger_flex = dPosition;
-            //  if(0.75f * 90 * dPosition<45)
-            gob_bones[0].transform.localEulerAngles = new Vector3(90 * dPosition* dPosition, 0, 0);
-     //   else
-      //      gob_bones[0].transform.localEulerAngles = new Vector3(1.125f * 90 * dPosition*dPosition, 0, 0);
-        if (1.5f * 90 * dPosition<90)
-            gob_bones[1].transform.localEulerAngles = new Vector3(1.5f*90 * dPosition, 0, 0);
+        gob_bones[0].transform.localEulerAngles = new Vector3(90 * dPosition * dPosition, 0, 0);
+        if (1.5f * 90 * dPosition < 90)
+            gob_bones[1].transform.localEulerAngles = new Vector3(1.5f * 90 * dPosition, 0, 0);
         gob_bones[2].transform.localEulerAngles = new Vector3(90 * dPosition, 0, 0);
 
-        UpdateFingerFlex();
+        UpdateFingerPosition();
     }
 
-    private void UpdateFingerFlex()
+    private void UpdateFingerPosition()
     {
-        if (finger_flex <= OPEN)
-            flex_postion = FingerPosition.Open;
-        else if (finger_flex >= CLOSED)
-            flex_postion = FingerPosition.Closed;
+        if (finger_flex <= BENT)
+            flex_postion = FingerPosition.Straight;
         else
-            flex_postion = FingerPosition.HalfOpen;
+            flex_postion = FingerPosition.Bent;
     }
 
     public void UpdateCollider()
     {
         i_collision_power = 0;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 2; i++)
             if (gob_bones[0].name == "boneTh1")
                 i_collision_power += col_finger_colliders[i].GetComponent<FingerColliider>().i_collision;
     }
